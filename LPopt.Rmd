@@ -1,0 +1,100 @@
+---
+title: "LP optimize"
+author: "Dr. J"
+date: "3/15/2020"
+output: html_document
+---
+
+# Data Analytics: optimization  
+Optimization is an important part of data analytics.  In this problem we solve a linear programming example:
+
+Maximize  
+$Profit = 5 \times x_1 + 7 \times x_2$  
+
+subject to the constraints:  
+$x_1 \le 16$  
+$2 \times x_1 + 3 \times x_2 \le 19$  
+$x_1 + x_2 \le 8$  and  
+$x_1 , x_2 \ge 0$  
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+ Import lpSolve package
+```{r}
+library(lpSolve)
+```
+
+
+Set coefficients of the objective function
+```{r}
+f.obj <- c(5, 7)
+```
+
+
+Set matrix corresponding to coefficients of constraints by rows
+Notice that the non-negative constraints on $x_1$ and $x_2$ are automatically assumed  
+
+```{r}
+f.con <- matrix(c(1, 0,
+                  2, 3,
+                  1, 1), nrow = 3, byrow = TRUE)
+
+```
+
+
+Set inequality signs:  
+```{r}
+f.dir <- c("<=",
+           "<=",
+           "<=")
+```
+
+Set right hand side coefficients
+```{r}
+f.rhs <- c(16,
+           19,
+           8)
+```
+
+
+Find maximum profit
+```{r}
+maxP = lp("max", f.obj, f.con, f.dir, f.rhs)
+print(maxP)
+```
+
+
+print the values of $x_1$ and $x_2$ that maximize profit:
+  
+```{r}
+print(paste('x1: ',maxP$solution[1], '  x2: ',maxP$solution[2]))
+```
+
+
+## Sensitivities
+```{r}
+lp("max", f.obj, f.con, f.dir, f.rhs, compute.sens=TRUE)$sens.coef.from
+lp("max", f.obj, f.con, f.dir, f.rhs, compute.sens=TRUE)$sens.coef.to
+```
+
+
+
+ Dual Values (first dual of the constraints and then dual of the variables)  
+ Duals of the constraints and variables are mixed  
+ 
+```{r}
+lp("max", f.obj, f.con, f.dir, f.rhs, compute.sens=TRUE)$duals
+```
+
+
+
+Duals lower and upper limits
+
+```{r}
+lp("max", f.obj, f.con, f.dir, f.rhs, compute.sens=TRUE)$duals.from
+lp("max", f.obj, f.con, f.dir, f.rhs, compute.sens=TRUE)$duals.to
+```
+
